@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { BrowserRouter ,HashRouter ,Route, Link,Switch } from 'react-router-dom'
+import { HashRouter ,Route,Switch } from 'react-router-dom'
 import Admin from './pages/admin/admin'
 import Login from './pages/login/login'
 
