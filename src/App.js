@@ -9,7 +9,7 @@ export default class App extends Component {
       <HashRouter >
         <Switch >
           <Route path="/login" component={Login} />
-          <Route path="/admin" component={Admin} />
+          <Route path="/" component={Admin} />
         </Switch>
       </HashRouter>
     )
