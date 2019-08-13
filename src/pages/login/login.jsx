@@ -34,6 +34,7 @@ class LoginForm extends Component {
                     memoryUtils.user = user
                     // 跳转到admin   location/match/history
                     this.props.history.replace('/')
+                    message.success('登录成功~~~')
                 } else {// 登录请求失败
                     message.error(result.msg)
                 }
