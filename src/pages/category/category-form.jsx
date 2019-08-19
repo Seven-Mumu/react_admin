@@ -1,31 +1,26 @@
 import React, { Component } from 'react'
+import { Form, Input } from 'antd'
 import PropTypes from 'prop-types'
 
 
-import {
-  Form,
-  Input
-} from 'antd'
-
 const Item = Form.Item
 
-/* 
-添加/修改分类的Form组件
-*/
-class AddUpdateForm extends Component {
+class categoryForm extends Component {
 
   static propTypes = {
-    setForm: PropTypes.func.isRequired,
-    categoryName: PropTypes.string,
+    setForm:PropTypes.func.isRequired,
+    categoryName:PropTypes.string
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.props.setForm(this.props.form)
   }
+  
+
 
   render() {
     const { getFieldDecorator } = this.props.form
-    const { categoryName } = this.props
+    const {categoryName} = this.props
     return (
       <Form>
         <Item>
@@ -33,10 +28,10 @@ class AddUpdateForm extends Component {
             getFieldDecorator('categoryName', {
               initialValue: categoryName || '',
               rules: [
-                {required: true, message: '分类名称必须输入'}
+                { required: true, message: '请输入分类名称!' }
               ]
             })(
-              <Input type="text" placeholder="请输入分类名称"></Input>
+              <Input type='text' placeholder='请输入分类名称' />
             )
           }
         </Item>
@@ -44,5 +39,4 @@ class AddUpdateForm extends Component {
     )
   }
 }
-
-export default Form.create()(AddUpdateForm)
+export default Form.create()(categoryForm)

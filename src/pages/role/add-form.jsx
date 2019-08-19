@@ -20,7 +20,6 @@ class AddForm extends PureComponent {
 
   render() {
     const { getFieldDecorator } = this.props.form
-    
     const formItemLayout = {
       labelCol: { span: 5 },
       wrapperCol: { span: 16 }
@@ -33,7 +32,7 @@ class AddForm extends PureComponent {
             getFieldDecorator('roleName', {
               initialValue: '',
               rules: [
-                {required: true, message: '必须输入角色名称'}
+                { required: true, message: '必须输入角色名称' }
               ]
             })(
               <Input type="text" placeholder="请输入角色名称" />

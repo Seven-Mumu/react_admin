@@ -1,8 +1,8 @@
 import React from 'react'
-import PropTypes from "prop-types"
+import PropTypes from 'prop-types'
 import { Upload, Icon, Modal, message } from 'antd'
-import {reqDeleteImg} from '../../api'
-import {BASE_IMG} from '../../utils/Constants'
+import { reqDeleteImg } from '../../api'
+import { IMG_BASE_URL } from '../../utils/Constants'
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -20,46 +20,25 @@ export default class PicturesWall extends React.Component {
   }
 
   state = {
-    previewVisible: false, // 标识是否显示大图预览
-    previewImage: '', // 大图的url或者base64值
-    fileList: [
-      /* { // 文件信息对象 file
-        uid: '-1', // 唯一标识
-        name: 'xxx.png', // 文件名
-        status: 'done', // 状态有：uploading done error removed
-        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png', // 图片的url
-      }, */
-    ],
+    previewVisible: false, // 是否显示大图
+    previewImage: '', // 预览的大图的url
+    fileList: [], // 所有已上传文件的列表
   }
 
-  componentWillMount () {
-    // 根据传入的imgs生成fileList并更新
-    const imgs = this.props.imgs
-    if (imgs && imgs.length>0) {
-      const fileList = imgs.map((img, index) => ({
-        uid: -index, // 唯一标识
-        name: img, // 文件名
-        status: 'done', // 状态有：uploading done error removed
-        url: BASE_IMG + img
-      }))
-      this.setState({ fileList })
-    }
+  getImgs = () => {
+    return this.state.fileList.map(file => file.name)
   }
 
   /* 
-  获取所有已上传图片文件名的数组
+  隐藏大图预览
   */
-  getImgs = () => this.state.fileList.map(file => file.name)
-
-
   handleCancel = () => this.setState({ previewVisible: false });
 
   /* 
-  进行大图预览的回调函数
-  file: 当前选择的图片对应的file
+  显示大图预览
   */
   handlePreview = async file => {
-    if (!file.url && !file.preview) { // 如果file没有图片url, 只进行一次base64处理来显示图片
+    if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
 
@@ -70,34 +49,54 @@ export default class PicturesWall extends React.Component {
   };
 
   /* 
-  在file的状态发生改变的监听回调
-  file: 当前操作(上传/删除)的file
+  当进行文件上传/删除时, 文件状态发生改变时调用
   */
   handleChange = async ({ file, fileList }) => {
-    // file与fileList中最后一个file代表同个图片的不同对象
-    console.log('handleChange()', file.status, file===fileList[fileList.length-1])
-    // 如果上传成功
+    console.log('handleChange', file.status, file === fileList[fileList.length-1])
+    // 上传已完成
     if (file.status==='done') {
-      // 将数组最后一个file保存到file变量
+      // file与fileList最后一个file代表的都是当前操作图片, 但不是同个对象
+      // 取出最后个file
       file = fileList[fileList.length - 1]
-      // 取出响应数据中的图片文件名和url
-      const {name, url} = file.response.data
-      // 保存到上传的file对象
+      // 取出上传图片中的响应数据
+      const { name, url } = file.response.data
+      // 修正file中的属性
       file.name = name
       file.url = url
     } else if (file.status==='removed') { // 删除
       const result = await reqDeleteImg(file.name)
       if (result.status===0) {
-        message.success('删除图片成功')
-      } else {
-        message.error('删除图片失败')
+        message.success('删除图片成功!')
       }
     }
-
-    // 更新状态
+    // 更新状态显示
     this.setState({ fileList })
   }
 
+
+  componentWillMount () {
+    const imgs = this.props.imgs
+    if (imgs && imgs.length>0) {
+      /* 
+      {
+        uid: '-5',
+        name: 'image.png',
+        status: 'done',
+        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+      },
+      */
+      const fileList = imgs.map((img, index) => ({
+        uid: -index,
+        name: img,
+        status: 'done',
+        url: IMG_BASE_URL + img,
+      }))
+      // 更新状态
+      this.setState({
+        fileList
+      })
+    }
+  }
 
   render() {
     const { previewVisible, previewImage, fileList } = this.state;
@@ -107,19 +106,19 @@ export default class PicturesWall extends React.Component {
         <div className="ant-upload-text">Upload</div>
       </div>
     );
-   
     return (
       <div>
         <Upload
-          action="/manage/img/upload" // 上传图片的url
-          name="image" // 图片文件对应参数名
-          listType="picture-card" // 显示风格
-          fileList={fileList} // 已上传的所有图片文件信息对象的数组
+          action="/manage/img/upload"
+          listType="picture-card"
+          fileList={fileList}
+          name="image"
           onPreview={this.handlePreview}
           onChange={this.handleChange}
         >
-          {fileList.length >= 3 ? null : uploadButton}
+          {fileList.length >= 4 ? null : uploadButton}
         </Upload>
+
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
